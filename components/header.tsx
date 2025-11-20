@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
 import { IconBrandGithub } from '@tabler/icons-react';
+import { ThemeToggleButton } from "./theme-switch";
 
 export default function Header() {
   return (
@@ -11,6 +12,7 @@ export default function Header() {
           <Image src="/vibreon-title.png" alt="Vibreon Title" width={125} height={80} />
         </div>
         <div className="flex items-center gap-4 mr-5">
+          <ThemeToggleButton variant="circle" start="top-right" blur />
           <IconBrandGithub className="w-6 h-6 cursor-pointer" onClick={() => window.open("https://github.com/aditya-shanbhag-dev/vibreon")} />
         </div>
       </div>

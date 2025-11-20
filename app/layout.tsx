@@ -3,6 +3,8 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "sonner";
 import Header from "@/components/header";
+import Footer from "@/components/footer";
+import Background from "@/components/background";
 
 
 export const metadata: Metadata = {
@@ -33,16 +35,20 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="relative max-w-7xl min-h-screen mx-auto w-full bg-background flex flex-col antialiased">
+      <body className="relative min-h-screen mx-auto w-full bg-background antialiased">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
-          <Header />
-          {children}
-          <Toaster />
+          <Background />
+          <div className="max-w-7xl min-h-screen mx-auto w-full flex flex-col">
+            <Header />
+            {children}
+            <Footer />
+            <Toaster />
+          </div>
         </ThemeProvider>
       </body>
     </html>

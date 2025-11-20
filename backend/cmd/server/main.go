@@ -24,6 +24,8 @@ func main() {
 
 	http.HandleFunc("/generate", handlers.GenerateHandler)
 
+	http.HandleFunc("/yt/extract", handlers.YTExtractHandler)
+
 	log.Println("Vibreon backend running on :" + port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
