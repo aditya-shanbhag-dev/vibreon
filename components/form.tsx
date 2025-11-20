@@ -11,6 +11,8 @@ import { Field, FieldContent, FieldDescription, FieldLabel } from './ui/field';
 import { Switch } from './ui/switch';
 import { GradientText } from './ui/gradient-text';
 import { toast } from 'sonner';
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
+import Link from 'next/link';
 
 
 export default function Form() {
@@ -52,6 +54,8 @@ export default function Form() {
     const [videos, setVideos] = useState<SimplifiedVideo[]>([]);
     const [selectedVideo, setSelectedVideo] = useState<number | null>(null);
     const [previewVideo, setPreviewVideo] = useState<string | null>(null);
+    const [showLoader, setShowLoader] = useState(false);
+
 
     const YT_REGEX =
         /^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)[a-zA-Z0-9_-]{11}/;
@@ -150,69 +154,77 @@ export default function Form() {
     };
 
     const handleGenerate = async () => {
-        if (!mp3 && !ytUrl) {
-            toast.error("Please upload an MP3 or paste a YouTube link.");
-            return;
-        }
+        try {
+            if (!mp3 && !ytUrl) {
+                toast.error("Please upload an MP3 or paste a YouTube link.");
+                return;
+            }
 
-        if (!selectedVideo) {
-            toast.error("Please select a background video.");
-            return;
-        }
+            if (!selectedVideo) {
+                toast.error("Please select a background video.");
+                return;
+            }
 
-        // 1. Upload MP3 or extract audio from YouTube
-        let audioUrl = "";
-        let isYoutube = false;
+            setShowLoader(true);
 
-        if (mp3) {
-            const formData = new FormData();
-            formData.append("file", mp3);
+            // 1. Upload MP3 or extract audio from YouTube
+            let audioUrl = "";
+            let isYoutube = false;
 
-            const uploadRes = await fetch("/api/upload-mp3", {
+            if (mp3) {
+                const formData = new FormData();
+                formData.append("file", mp3);
+
+                const uploadRes = await fetch("/api/upload-mp3", {
+                    method: "POST",
+                    body: formData
+                });
+
+                const uploadJson = await uploadRes.json();
+                audioUrl = uploadJson.secureUrl;
+            } else if (ytUrl) {
+                isYoutube = true;
+                const ytRes = await fetch("/api/extract-yt", {
+                    method: "POST",
+                    body: JSON.stringify({ ytUrl })
+                });
+                const ytJson = await ytRes.json();
+                audioUrl = ytJson.secureUrl;
+            }
+
+            // 2. Collect Effect
+            const effect = (
+                document.querySelector("input[type='radio']:checked") as HTMLInputElement)?.value;
+
+            // 3. Collect Selected BG Video
+            const selected = videos.find(v => v.id === selectedVideo);
+
+            // 4. Collect Need Lyrics
+            const needLyrics = (document.getElementById("need-lyrics") as HTMLInputElement)?.checked;
+
+            // Construct final payload for Go backend
+            const payload = {
+                audioUrl,
+                isYoutube,
+                effect,
+                backgroundVideo: selected?.videoUrl,
+                needLyrics
+            };
+
+            // Call your Go backend API
+            const response = await fetch("/api/generate-video", {
                 method: "POST",
-                body: formData
+                body: JSON.stringify(payload)
             });
 
-            const uploadJson = await uploadRes.json();
-            audioUrl = uploadJson.secureUrl;
-        } else if (ytUrl) {
-            isYoutube = true;
-            const ytRes = await fetch("/api/extract-yt", {
-                method: "POST",
-                body: JSON.stringify({ ytUrl })
-            });
-            const ytJson = await ytRes.json();
-            audioUrl = ytJson.secureUrl;
+            const result = await response.json();
+            toast.info("Generating video...");
+            console.log("Generation started:", result);
+        } catch (err) {
+            toast.error("An error occurred.");
+        } finally {
+            setShowLoader(false);
         }
-
-        // 2. Collect Effect
-        const effect = (
-            document.querySelector("input[type='radio']:checked") as HTMLInputElement)?.value;
-
-        // 3. Collect Selected BG Video
-        const selected = videos.find(v => v.id === selectedVideo);
-
-        // 4. Collect Need Lyrics
-        const needLyrics = (document.getElementById("need-lyrics") as HTMLInputElement)?.checked;
-
-        // Construct final payload for Go backend
-        const payload = {
-            audioUrl,
-            isYoutube,
-            effect,
-            backgroundVideo: selected?.videoUrl,
-            needLyrics
-        };
-
-        // Call your Go backend API
-        const response = await fetch("/api/generate-video", {
-            method: "POST",
-            body: JSON.stringify(payload)
-        });
-
-        const result = await response.json();
-        toast.info("Generating video...");
-        console.log("Generation started:", result);
     };
 
     return (
@@ -222,7 +234,7 @@ export default function Form() {
                 <GradientText className="text-4xl font-bold" text="Build Your Personalized Music Video" />
             </div>
             <div className="flex items-start justify-between gap-5">
-                <div className="grid w-full gap-3">
+                <div className="grid w-full gap-3 max-w-md">
                     <Label htmlFor="mp3" className='text-xl tracking-tight'><IconFileMusic /> Upload MP3 File</Label>
                     <Input
                         id="mp3"
@@ -230,10 +242,10 @@ export default function Form() {
                         accept="audio/mpeg"
                         onChange={handleMp3Change}
                         disabled={ytUrl.length > 0}
-                        className="cursor-pointer text-muted-foreground file:border-input file:text-foreground p-0 pr-3 italic file:mr-3 file:h-full file:border-0 file:border-r file:border-solid file:bg-transparent file:px-3 file:text-sm file:font-medium file:not-italic"
+                        className="w-full max-w-md cursor-pointer text-muted-foreground file:border-input file:text-foreground p-0 pr-3 italic file:mr-3 file:h-full file:border-0 file:border-r file:border-solid file:bg-transparent file:px-3 file:text-sm file:font-medium file:not-italic"
                     />
                     {mp3 && (
-                        <div className="flex items-center justify-between rounded-md bg-muted p-2">
+                        <div className="w-full max-w-md flex items-center justify-between rounded-md bg-muted p-2">
                             <span className="text-sm truncate">{mp3.name}</span>
                             <Button
                                 variant="secondary"
@@ -402,6 +414,27 @@ export default function Form() {
                 className='cursor-pointer hover:scale-105 hover:ring-2 hover:ring-ring w-fit'>
                 <IconSparkles /> Generate Video
             </Button>
+            {showLoader && (
+                <div className="fixed inset-0 z-9999 flex items-center justify-center backdrop-blur-md bg-black/40 w-full">
+                    <div className='relative flex flex-col items-center justify-center gap-3 rounded-xl border-2 bg-background pt-10 max-w-4xl mx-auto'>
+                        <GradientText className="text-2xl font-bold tracking-tight text-shadow-lg" text="Your video is brewing... here's something cool to watch while you wait!" />
+                        <div className='flex gap-1 p-3 items-center justify-center'>
+                            <DotLottieReact
+                                src="https://lottie.host/15971376-5c4f-4dab-8c31-6ed3a7f6d9c9/Y4z3wlTpmf.lottie"
+                                loop
+                                autoplay
+                            />
+                            <div className="mx-auto p-5 flex flex-col gap-2">
+                                <video src="/loadervid.mp4" autoPlay controls playsInline loop
+                                    preload="metadata" className="w-full rounded-lg shadow-2xl"
+                                />
+                                <div>Credits: <Link href="https://www.youtube.com/watch?v=MoDGzRa1LW0"
+                                    target="_blank" rel="noopener noreferrer" className='underline'>Hyun's Dojo Community</Link></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
