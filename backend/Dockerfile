@@ -19,7 +19,7 @@ RUN apt-get update && \
 
 # Add fonts and rebuild font cache
 COPY fonts /usr/share/fonts/vibreon/
-RUN fc-cache -f -v   
+RUN fc-cache -f -v
 
 WORKDIR /app
 COPY --from=builder /app/backend .

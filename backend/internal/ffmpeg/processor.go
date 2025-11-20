@@ -27,6 +27,10 @@ func downloadFile(url, filename string) error {
 	if err != nil {
 		return err
 	}
+	if resp.StatusCode != 200 {
+		return fmt.Errorf("file download failed: status %d", resp.StatusCode)
+	}
+
 	defer resp.Body.Close()
 
 	out, err := os.Create(filename)
@@ -102,10 +106,29 @@ func ProcessWithFFmpeg(payload models.GeneratePayload) (string, error) {
 		return "", fmt.Errorf("failed to download video: %v", err)
 	}
 
+	filter := GetAudioFilter(payload.Effect)
+	processedAudio := "processed_" + timestamp + ".mp3"
+
+	if filter != "" {
+		cmd := exec.Command("ffmpeg", "-y",
+			"-i", audioFile,
+			"-af", filter,
+			processedAudio,
+		)
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		if err := cmd.Run(); err != nil {
+			return "", fmt.Errorf("audio effect processing failed: %v", err)
+		}
+	} else {
+		// no effect → just use original
+		processedAudio = audioFile
+	}
+
 	srtPath := ""
 	// AUTO-GENERATE SUBTITLES IF NEEDED
 	if payload.NeedLyrics {
-		err := groq.GenerateSRT(audioFile, srtFile)
+		err := groq.GenerateSRT(processedAudio, srtFile)
 		if err != nil {
 			return "", fmt.Errorf("subtitle generation failed: %v", err)
 		}
@@ -119,7 +142,7 @@ func ProcessWithFFmpeg(payload models.GeneratePayload) (string, error) {
 
 	// FFmpeg process
 	ffmpegErr := RunFFmpeg(FFmpegInput{
-		AudioPath: audioFile,
+		AudioPath: processedAudio,
 		VideoPath: videoFile,
 		SrtPath:   srtPath,
 		Output:    outFile,
@@ -143,6 +166,7 @@ func ProcessWithFFmpeg(payload models.GeneratePayload) (string, error) {
 
 	// cleanup
 	os.Remove(audioFile)
+	os.Remove(processedAudio)
 	os.Remove(videoFile)
 	os.Remove(outFile)
 	if payload.NeedLyrics {
