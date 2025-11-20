@@ -2,7 +2,8 @@ package models
 
 type GeneratePayload struct {
 	AudioURL   string `json:"audioUrl"`
-	VideoURL   string `json:"videoUrl"`
+	IsYouTube  bool   `json:"isYoutube"`
+	VideoURL   string `json:"backgroundVideo"`
 	NeedLyrics bool   `json:"needLyrics"`
 	Effect     string `json:"effect"`
 }

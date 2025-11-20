@@ -11,13 +11,13 @@ import { Field, FieldContent, FieldDescription, FieldLabel } from './ui/field';
 import { Switch } from './ui/switch';
 import { GradientText } from './ui/gradient-text';
 import { toast } from 'sonner';
-import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 
-export default function Form() {
+export default function MVGenerator() {
 
-    const items = [
+    const songEffects = [
         { value: 'normal', label: 'Normal' },
         { value: 'slowed_reverb', label: 'Slowed + Reverb' },
         { value: 'bass_boosted', label: 'Bass Boosted' },
@@ -47,18 +47,19 @@ export default function Form() {
 
     const id = useId();
     const [mp3, setMp3] = useState<File | null>(null);
+    const [effect, setEffect] = useState("normal");
     const [ytUrl, setYtUrl] = useState("");
     const [theme, setTheme] = useState("");
     const [ytLinkError, setytLinkError] = useState("");
     const [themeError, setThemeError] = useState("");
     const [videos, setVideos] = useState<SimplifiedVideo[]>([]);
+    const [needLyrics, setNeedLyrics] = useState(false);
     const [selectedVideo, setSelectedVideo] = useState<number | null>(null);
     const [previewVideo, setPreviewVideo] = useState<string | null>(null);
     const [showLoader, setShowLoader] = useState(false);
+    const [output, setOutput] = useState("");
 
-
-    const YT_REGEX =
-        /^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)[a-zA-Z0-9_-]{11}/;
+    const YT_REGEX = /^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)[a-zA-Z0-9_-]{11}/;
 
     const extractVideoInfo = (v: PexelsVideo): SimplifiedVideo => {
         const thumbnail = v.video_pictures?.[0]?.picture || "";
@@ -174,14 +175,13 @@ export default function Form() {
             if (mp3) {
                 const formData = new FormData();
                 formData.append("file", mp3);
-
                 const uploadRes = await fetch("/api/upload-mp3", {
                     method: "POST",
                     body: formData
                 });
 
                 const uploadJson = await uploadRes.json();
-                audioUrl = uploadJson.secureUrl;
+                audioUrl = uploadJson.secure_url;
             } else if (ytUrl) {
                 isYoutube = true;
                 const ytRes = await fetch("/api/extract-yt", {
@@ -189,18 +189,11 @@ export default function Form() {
                     body: JSON.stringify({ ytUrl })
                 });
                 const ytJson = await ytRes.json();
-                audioUrl = ytJson.secureUrl;
+                audioUrl = ytJson.secure_url;
             }
 
-            // 2. Collect Effect
-            const effect = (
-                document.querySelector("input[type='radio']:checked") as HTMLInputElement)?.value;
-
-            // 3. Collect Selected BG Video
+            // Collect Selected BG Video
             const selected = videos.find(v => v.id === selectedVideo);
-
-            // 4. Collect Need Lyrics
-            const needLyrics = (document.getElementById("need-lyrics") as HTMLInputElement)?.checked;
 
             // Construct final payload for Go backend
             const payload = {
@@ -210,16 +203,18 @@ export default function Form() {
                 backgroundVideo: selected?.videoUrl,
                 needLyrics
             };
+            console.log(payload);
 
-            // Call your Go backend API
             const response = await fetch("/api/generate-video", {
                 method: "POST",
                 body: JSON.stringify(payload)
             });
 
             const result = await response.json();
-            toast.info("Generating video...");
+            toast.info("Video is generated");
             console.log("Generation started:", result);
+
+            setOutput(result.videoUrl);
         } catch (err) {
             toast.error("An error occurred.");
         } finally {
@@ -282,8 +277,11 @@ export default function Form() {
                 <legend className="text-foreground text-xl tracking-tight leading-none font-medium flex items-center gap-2">
                     <IconBrandDeezer /> Select Effects:
                 </legend>
-                <RadioGroup className='grid grid-cols-4 gap-5' defaultValue='normal'>
-                    {items.map(item => (
+                <RadioGroup className='grid grid-cols-4 gap-5'
+                    defaultValue='normal' value={effect}
+                    onValueChange={setEffect}
+                >
+                    {songEffects.map(item => (
                         <label
                             key={`${id}-${item.value}`}
                             className={cn('border-input has-data-[state=checked]:border-primary/80 has-data-[state=checked]:bg-muted/60',
@@ -407,30 +405,36 @@ export default function Form() {
                             <IconInfoCircle className='inline-flex size-3 mb-1' /> Accuracy may vary, and rendering time will increase when this is enabled.
                         </FieldDescription>
                     </FieldContent>
-                    <Switch id="need-lyrics" />
+                    <Switch id="need-lyrics" checked={needLyrics} onCheckedChange={setNeedLyrics} />
                 </Field>
             </div>
             <Button variant="default" onClick={handleGenerate}
                 className='cursor-pointer hover:scale-105 hover:ring-2 hover:ring-ring w-fit'>
                 <IconSparkles /> Generate Video
             </Button>
+            {output && (
+                <div className='w-full mx-auto p-10 flex flex-col gap-3'>
+                    <video src={output} autoPlay controls playsInline loop
+                        preload="metadata" className="w-full rounded-lg shadow-2xl"
+                    />
+                </div>
+            )}
             {showLoader && (
                 <div className="fixed inset-0 z-9999 flex items-center justify-center backdrop-blur-md bg-black/40 w-full">
-                    <div className='relative flex flex-col items-center justify-center gap-3 rounded-xl border-2 bg-background pt-10 max-w-4xl mx-auto'>
-                        <GradientText className="text-2xl font-bold tracking-tight text-shadow-lg" text="Your video is brewing... here's something cool to watch while you wait!" />
+                    <div className='relative flex flex-col items-center justify-center gap-3 rounded-xl border-2 bg-background py-5 px-3 max-w-4xl mx-auto'>
                         <div className='flex gap-1 p-3 items-center justify-center'>
-                            <DotLottieReact
-                                src="https://lottie.host/15971376-5c4f-4dab-8c31-6ed3a7f6d9c9/Y4z3wlTpmf.lottie"
-                                loop
-                                autoplay
-                            />
-                            <div className="mx-auto p-5 flex flex-col gap-2">
-                                <video src="/loadervid.mp4" autoPlay controls playsInline loop
-                                    preload="metadata" className="w-full rounded-lg shadow-2xl"
-                                />
-                                <div>Credits: <Link href="https://www.youtube.com/watch?v=MoDGzRa1LW0"
-                                    target="_blank" rel="noopener noreferrer" className='underline'>Hyun's Dojo Community</Link></div>
+                            <Image alt="sandy-loading" src="/sandy-loading.gif" width={60} height={80} />
+                            <div className='flex flex-col items-start justify-center gap-1'>
+                                <GradientText className="text-4xl font-bold tracking-tight text-shadow-lg" text="Hang tight, your video is brewing...." />
+                                <GradientText className="text-xl font-bold tracking-tight text-shadow-lg" text="Here's something cool to watch while you wait!" />
                             </div>
+                        </div>
+                        <div className="mx-auto p-3 flex flex-col gap-2">
+                            <video src="/loadervid.mp4" autoPlay controls playsInline loop
+                                preload="metadata" className="w-full rounded-lg shadow-2xl max-w-[480px] max-h-[270px]"
+                            />
+                            <div>Credits: <Link href="https://www.youtube.com/watch?v=MoDGzRa1LW0"
+                                target="_blank" rel="noopener noreferrer" className='underline'>Hyun's Dojo Community</Link></div>
                         </div>
                     </div>
                 </div>
