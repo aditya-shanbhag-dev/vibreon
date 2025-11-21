@@ -7,8 +7,8 @@ import { IconBrandGithub } from '@tabler/icons-react'
 
 export default function Footer() {
     return (
-        <footer className='max-w-7xl bottom-0 mt-auto mx-auto h-auto pt-10 pb-5 w-full px-5 z-50'>
-            <div className='mx-auto flex max-w-7xl items-center justify-between gap-3 px-2 py-4 max-md:flex-col sm:px-6 sm:py-4 md:gap-6 md:py-4'>
+        <footer className='max-w-7xl bottom-0 mt-auto mx-auto h-auto pt-10 pb-5 w-full px-5'>
+            <div className='mx-auto flex max-w-7xl items-center justify-between gap-3 px-2 py-4 max-md:flex-col sm:px-6 sm:py-4 md:gap-6 md:py-4 z-50'>
                 <a href='#'>
                     <div className='flex items-center gap-1'>
                         <Image src="/vibreon-logo.png" alt="Vibreon Logo" width={65} height={65} />
@@ -25,8 +25,8 @@ export default function Footer() {
                     <a href='/legal#tos' className='hover:scale-120'>Terms of Service</a>
                 </div>
             </div>
-            <Separator />
-            <div className='mx-auto flex max-w-7xl justify-between px-4 py-5 sm:px-6'>
+            <Separator className='z-50'/>
+            <div className='mx-auto flex max-w-7xl justify-between px-4 py-5 sm:px-6 z-50'>
                 <p className='text-center font-medium text-balance'>
                     ©{new Date().getFullYear()} <a href='#'>Vibreon</a>, Made with ❤️ by{" "}
                     <Link
