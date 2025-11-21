@@ -10,15 +10,16 @@ COPY . .
 RUN go build -o backend ./cmd/server
 
 # Runtime container
-FROM ubuntu:latest
+FROM ubuntu:24.04
 
 # Install ffmpeg, python3, pip, and yt-dlp
 # yt-dlp requires ffmpeg for the audio format conversion
 RUN apt-get update && \
     apt-get install -y ffmpeg ca-certificates python3 python3-pip && \
-    pip install yt-dlp && \
+    pip install yt-dlp --break-system-packages && \
     update-ca-certificates && \
-    apt-get clean
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 # Add fonts and rebuild font cache
 COPY fonts /usr/share/fonts/vibreon/
