@@ -80,7 +80,7 @@ Ensure the frontend sees `CLOUDINARY_*`, `PEXELS_API_KEY` and `GO_SERVER` in its
 
 2) Backend (Go)
 
-# Option A — Run locally (needs ffmpeg & yt-dlp on system)
+## Option A — Run locally (needs ffmpeg & yt-dlp on system)
 
 ```
 cd backend
@@ -91,7 +91,7 @@ go build -o vibreon-backend ./cmd/server
 ./vibreon-backend
 ```
 
-# Option B — Run via Docker (image includes ffmpeg & yt-dlp)
+## Option B — Run via Docker (image includes ffmpeg & yt-dlp)
 
 PowerShell example:
 
