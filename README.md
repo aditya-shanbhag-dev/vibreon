@@ -1,6 +1,7 @@
 # Vibreon
 
 Generate personalized short music videos by combining audio (uploaded or extracted from YouTube) with stock background videos, AI-generated lyrics, and audio effects.
+Vibreon is a music video generator that transforms any audio into stunning visual content using FFmpeg. Vibreon makes it effortless to create aesthetic edits, lofi loops, lyric videos, and social-ready content.
 
 ## High-level Overview
 
