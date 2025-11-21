@@ -12,8 +12,11 @@ RUN go build -o backend ./cmd/server
 # Runtime container
 FROM ubuntu:latest
 
+# Install ffmpeg, python3, pip, and yt-dlp
+# yt-dlp requires ffmpeg for the audio format conversion
 RUN apt-get update && \
-    apt-get install -y ffmpeg ca-certificates && \
+    apt-get install -y ffmpeg ca-certificates python3 python3-pip && \
+    pip install yt-dlp && \
     update-ca-certificates && \
     apt-get clean
 

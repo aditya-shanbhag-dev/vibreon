@@ -13,6 +13,19 @@ import { GradientText } from './ui/gradient-text';
 import { toast } from 'sonner';
 import Link from 'next/link';
 import Image from 'next/image';
+import {
+    VideoPlayer,
+    VideoPlayerContent,
+    VideoPlayerControlBar,
+    VideoPlayerMuteButton,
+    VideoPlayerPlayButton,
+    VideoPlayerSeekBackwardButton,
+    VideoPlayerSeekForwardButton,
+    VideoPlayerTimeDisplay,
+    VideoPlayerTimeRange,
+    VideoPlayerVolumeRange,
+    VideoPlayerFullscreenButton
+} from './ui/video-player';
 
 
 export default function MVGenerator() {
@@ -447,13 +460,26 @@ export default function MVGenerator() {
                     <legend className="text-foreground text-2xl tracking-tight leading-none font-medium flex items-center gap-2">
                         <IconDeviceTvOld /> Final Result
                     </legend>
-                    <video src={output} autoPlay controls playsInline loop
-                        preload="metadata" className="w-full rounded-xl shadow-2xl max-h-[450px]"
-                    />
+                    <VideoPlayer className="rounded-lg border w-full h-[500px] shadow-2xl">
+                        <VideoPlayerContent crossOrigin="" preload="auto" slot="media"
+                            src={output}
+                            autoPlay loop playsInline className='h-full w-full object-contain'
+                        />
+                        <VideoPlayerControlBar>
+                            <VideoPlayerPlayButton />
+                            <VideoPlayerSeekBackwardButton />
+                            <VideoPlayerSeekForwardButton />
+                            <VideoPlayerTimeRange />
+                            <VideoPlayerTimeDisplay showDuration />
+                            <VideoPlayerMuteButton />
+                            <VideoPlayerVolumeRange />
+                            <VideoPlayerFullscreenButton />
+                        </VideoPlayerControlBar>
+                    </VideoPlayer>
                     <div className='flex items-center justify-center gap-5'>
                         <Button variant="outline" onClick={handleDownload}
                             className='cursor-pointer hover:scale-105 hover:shadow-2xl'>
-                            <IconDeviceDesktopDown /> Download {downloading && (<Image src="/download-loader.gif" alt="download-loader" width={15} height={15}/>)}
+                            <IconDeviceDesktopDown /> Download {downloading && (<Image src="/download-loader.gif" alt="download-loader" width={15} height={15} />)}
                         </Button>
                         <Button variant="default" onClick={() => { toast.info("This feature is not available at the moment") }}
                             className='cursor-pointer hover:scale-105 hover:shadow-2xl'>
@@ -467,9 +493,9 @@ export default function MVGenerator() {
                     <div className='relative flex flex-col items-center justify-center gap-3 rounded-xl border-2 bg-background py-5 px-3 max-w-4xl mx-auto'>
                         <div className='flex gap-1 p-3 m-2 items-center justify-center'>
                             <Image alt="sandy-loading" src="/sandy-loading.gif" width={60} height={80} />
-                            <div className='flex flex-col items-start justify-center gap-1'>
-                                <GradientText className="text-4xl font-bold tracking-tight text-shadow-lg" text="Hang tight, your video is brewing..." />
-                                <GradientText className="text-xl font-bold tracking-tight text-shadow-lg" text="Here's something cool to watch while you wait!" />
+                            <div className='flex flex-col items-start justify-center gap-2'>
+                                <GradientText className="text-3xl font-bold tracking-tight text-shadow-lg" text="Hang tight, your video is brewing..." />
+                                <GradientText className="text-lg font-bold tracking-tight text-shadow-lg" text="Here's something cool to watch while you wait!" />
                             </div>
                         </div>
                         <div className="mx-auto p-3 flex flex-col gap-2">

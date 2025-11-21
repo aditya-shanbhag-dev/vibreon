@@ -1,14 +1,11 @@
 package handlers
 
 import (
-	"bytes"
 	"encoding/json"
 	"io"
 	"log"
 	"net/http"
 	"os/exec"
-
-	"github.com/kkdai/youtube/v2"
 )
 
 type YTExtractRequest struct {
@@ -32,73 +29,50 @@ func YTExtractHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Println("Extracting audio from YouTube:", body.URL)
+	log.Println("Extracting audio with yt-dlp from YouTube:", body.URL)
 
-	client := youtube.Client{}
-
-	video, err := client.GetVideo(body.URL)
-	if err != nil {
-		log.Println("YouTube fetch error:", err)
-		http.Error(w, "Failed to fetch YouTube video", http.StatusInternalServerError)
-		return
-	}
-
-	// Correct way: choose *any* format with audio channels
-	var format *youtube.Format
-	audioFormats := video.Formats.WithAudioChannels()
-
-	if len(audioFormats) == 0 {
-		http.Error(w, "No audio stream available", http.StatusInternalServerError)
-		return
-	}
-
-	// Pick the highest bitrate audio
-	format = &audioFormats[0]
-	for i := range audioFormats {
-		if audioFormats[i].Bitrate > format.Bitrate {
-			format = &audioFormats[i]
-		}
-	}
-
-	log.Println("Selected audio format:", format.MimeType, format.Bitrate)
-
-	// Download the stream
-	stream, _, err := client.GetStream(video, format)
-	if err != nil {
-		log.Println("Stream error:", err)
-		http.Error(w, "Failed to download audio stream", http.StatusInternalServerError)
-		return
-	}
-
-	// Send stream to FFmpeg → convert → mp3
-	var mp3 bytes.Buffer
-
-	cmd := exec.Command("ffmpeg",
-		"-i", "pipe:0",
-		"-vn",
-		"-acodec", "libmp3lame",
-		"-b:a", "192k",
-		"-f", "mp3",
-		"pipe:1",
+	// Command to execute yt-dlp:
+	// -f 'bestaudio': Selects the best audio format.
+	// -o -: Outputs the raw MP3 data to stdout.
+	cmd := exec.Command("yt-dlp",
+		"-f", "bestaudio",
+		"--extract-audio",
+		"--audio-format", "mp3",
+		"--audio-quality", "192K",
+		"-o", "-",
+		body.URL,
 	)
 
-	cmd.Stdout = &mp3
-	cmd.Stderr = io.Discard
+	// Set up stdout to pipe directly to the HTTP response writer
+	cmd.Stdout = w
 
-	stdin, _ := cmd.StdinPipe()
-
-	go func() {
-		io.Copy(stdin, stream)
-		stdin.Close()
-	}()
-
-	if err := cmd.Run(); err != nil {
-		log.Println("FFmpeg error:", err)
-		http.Error(w, "Failed to convert to MP3", http.StatusInternalServerError)
+	// Set up stderr for debugging logs. We discard it unless an error occurs.
+	stderr, err := cmd.StderrPipe()
+	if err != nil {
+		log.Println("Error setting up StderrPipe:", err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
 
+	// Set the Content-Type header BEFORE starting the command.
 	w.Header().Set("Content-Type", "audio/mpeg")
 	w.WriteHeader(http.StatusOK)
-	w.Write(mp3.Bytes())
+
+	// Start the command
+	if err := cmd.Start(); err != nil {
+		log.Println("yt-dlp start error:", err)
+		http.Error(w, "Failed to start audio extraction process", http.StatusInternalServerError)
+		return
+	}
+
+	// Wait for the command to finish. If it fails, read the error message from stderr.
+	if err := cmd.Wait(); err != nil {
+		errorOutput, _ := io.ReadAll(stderr)
+		log.Printf("yt-dlp execution error: %v. Stderr: %s\n", err, errorOutput)
+		// We can't change the status code (already written 200), but we log the failure.
+		// The client will get a truncated/empty file, which is handled by the Next.js side.
+		return
+	}
+
+	log.Println("Audio extraction complete.")
 }

@@ -6,7 +6,6 @@ import Header from "@/components/header";
 import Footer from "@/components/footer";
 import Background from "@/components/background";
 
-
 export const metadata: Metadata = {
   title: "Vibreon — Music Video Generator",
   description: `Create aesthetic AI-powered music videos with audio effects, HD visuals, lyrics, and more. 
