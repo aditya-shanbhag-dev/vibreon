@@ -137,7 +137,7 @@ export default function DemoSection() {
                         ))}
                     </div>
                     <div className="z-50 max-w-2xl p-5">
-                        <video ref={ref} src="/loadervid.mp4"
+                        <video ref={ref} src="https://res.cloudinary.com/ddtclo99a/video/upload/v1763846872/loadervid_1_x4riqn.mp4"
                             playsInline muted loop preload="metadata" className="w-full rounded-xl shadow"
                         />
                     </div>

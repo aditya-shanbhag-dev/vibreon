@@ -213,7 +213,7 @@ export default function MVGenerator() {
                             </div>
                         </div>
                         <div className="mx-auto p-3 flex flex-col gap-2">
-                            <video src="/loadervid.mp4" autoPlay controls playsInline loop
+                            <video src="https://res.cloudinary.com/ddtclo99a/video/upload/v1763846872/loadervid_1_x4riqn.mp4" autoPlay controls playsInline loop
                                 preload="metadata" className="w-full rounded-lg shadow-2xl max-w-[480px] max-h-[270px]"
                             />
                             <div>Credits: <Link href="https://www.youtube.com/watch?v=MoDGzRa1LW0"

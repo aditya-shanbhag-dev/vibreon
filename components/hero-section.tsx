@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { Safari } from './ui/safari';
 import { GradientText } from './ui/gradient-text';
+import Link from 'next/link';
 
 export default function HeroSection() {
   const heroRef = useRef<HTMLDivElement>(null);
@@ -107,12 +108,13 @@ export default function HeroSection() {
                 className="relative"
               >
                 <div className="bg-background/50 absolute inset-0 -z-10 rounded-full backdrop-blur-sm"></div>
-                <Button
-                  variant="outline"
-                  className="border-primary/20 hover:border-primary/30 hover:bg-primary/5 rounded-lg backdrop-blur-sm transition-all duration-300"
-                >
-                  Watch a Demo <Sparkles className="h-4 w-4" />
-                </Button>
+                <Link href="/#demo">
+                  <Button variant="outline"
+                    className="border-primary/20 hover:border-primary/30 hover:bg-primary/5 rounded-lg backdrop-blur-sm transition-all duration-300"
+                  >
+                    Watch a Demo <Sparkles className="h-4 w-4" />
+                  </Button>
+                </Link>
               </motion.div>
             </motion.div>
 
