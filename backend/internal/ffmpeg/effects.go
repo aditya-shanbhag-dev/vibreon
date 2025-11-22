@@ -9,12 +9,14 @@ func GetAudioFilter(effect string) string {
 		return "asetrate=44100*0.85,aresample=44100,aecho=0.8:0.8:1000:0.4"
 
 	case "bass_boosted":
-		// Use the modern 'lowshelf' filter.
-		return "lowshelf=g=10:f=110:s=0.5"
+		// Use the modern 'lowshelf' filter, removing the unsupported 's' (slope) option.
+		// g=10 (10dB boost), f=110 (boost frequency up to 110Hz).
+		return "lowshelf=g=10:f=110"
 
 	case "slowed_bass_boosted":
-		// Slow down and pitch down (0.85x speed/pitch) + Bass Boost (lowshelf)
-		return "asetrate=44100*0.85,aresample=44100,lowshelf=g=10:f=110:s=0.5"
+		// Slow down and pitch down (0.85x speed/pitch) + Bass Boost (lowshelf).
+		// Removing the unsupported 's' (slope) option.
+		return "asetrate=44100*0.85,aresample=44100,lowshelf=g=10:f=110"
 
 	case "sped_up_reverb":
 		// Speed up tempo (1.25x speed, no pitch change) + Echo/Delay (Safe Fallback)

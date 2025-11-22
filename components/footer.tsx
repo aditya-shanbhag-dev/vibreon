@@ -9,17 +9,17 @@ export default function Footer() {
     return (
         <footer className='max-w-7xl bottom-0 mt-auto mx-auto h-auto pt-10 pb-5 w-full px-5'>
             <div className='mx-auto flex max-w-7xl items-center justify-between gap-3 px-2 py-4 max-md:flex-col sm:px-6 sm:py-4 md:gap-6 md:py-4 z-50'>
-                <a href='#'>
+                <a href='/#'>
                     <div className='flex items-center gap-1'>
-                        <Image src="/vibreon-logo.png" alt="Vibreon Logo" width={65} height={65} />
-                        <Image src="/vibreon-title.png" alt="Vibreon Title" width={100} height={65} />
+                        <Image src="/vibreon-logo.png" alt="Vibreon Logo" width={65} height={65}  className='z-50'/>
+                        <Image src="/vibreon-title.png" alt="Vibreon Title" width={100} height={65} className='z-50'/>
                     </div>
                 </a>
 
                 <div className='flex items-center gap-5 whitespace-nowrap'>
                     <a href='/generate' className='hover:scale-120'>Try Now!</a>
                     <a href='/#home' className='hover:scale-120'>Home</a>
-                    <a href='/#about' className='hover:scale-120'>About</a>
+                    <a href='/#features' className='hover:scale-120'>Features</a>
                     <a href='/#demo' className='hover:scale-120'>Demo</a>
                     <a href='/legal#privacy' className='hover:scale-120'>Privacy policy</a>
                     <a href='/legal#tos' className='hover:scale-120'>Terms of Service</a>
