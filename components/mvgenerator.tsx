@@ -192,7 +192,7 @@ export default function MVGenerator() {
                     <div className='flex items-center justify-center gap-5'>
                         <Button variant="outline" onClick={handleDownload}
                             className='cursor-pointer hover:scale-105 hover:shadow-2xl'>
-                            <IconDeviceDesktopDown /> Download {downloading && (<Image src="/download-loader.gif" alt="download-loader" width={15} height={15} />)}
+                            <IconDeviceDesktopDown /> Download {downloading && (<Image src="/loaders/download-loader.gif" alt="download-loader" width={15} height={15} />)}
                         </Button>
                         <Button variant="default" onClick={() => { toast.info("This feature is not available at the moment") }}
                             className='cursor-pointer hover:scale-105 hover:shadow-2xl'>
@@ -206,7 +206,7 @@ export default function MVGenerator() {
                 <div className="fixed inset-0 z-9999 flex items-center justify-center backdrop-blur-md bg-black/40 w-full">
                     <div className='relative flex flex-col items-center justify-center gap-3 rounded-xl border-2 bg-background py-5 px-3 max-w-4xl mx-auto'>
                         <div className='flex gap-1 p-3 m-2 items-center justify-center'>
-                            <Image alt="sandy-loading" src="/sandy-loading.gif" width={60} height={80} />
+                            <Image alt="sandy-loading" src="/loaders/sandy-loading.gif" width={60} height={80} />
                             <div className='flex flex-col items-start justify-center gap-2'>
                                 <GradientText className="text-3xl font-bold tracking-tight text-shadow-lg" text="Hang tight, your video is brewing..." />
                                 <GradientText className="text-lg font-bold tracking-tight text-shadow-lg" text="Here's something cool to watch while you wait!" />

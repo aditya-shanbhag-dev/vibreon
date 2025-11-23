@@ -17,7 +17,7 @@ const features = [
         step: 'Step 2',
         title: 'Choose Your Audio Effect',
         content:
-            'Slowed reverb, nightcore, vaporwave, lofi, dreamcore, 8D, and more.',
+            'Slowed reverb, nightcore, lofi, dreamcore, 8D, and more.',
         icon: <IconWaveSawTool className="text-primary h-6 w-6" />,
     },
     {
@@ -129,15 +129,15 @@ export default function DemoSection() {
                                     <h3 className="text-xl font-semibold md:text-2xl">
                                         {feature.title}
                                     </h3>
-                                    <p className="text-muted-foreground text-sm md:text-base">
+                                    <p className="text-muted-foreground text-sm">
                                         {feature.content}
                                     </p>
                                 </div>
                             </motion.div>
                         ))}
                     </div>
-                    <div className="z-50 max-w-2xl p-5">
-                        <video ref={ref} src="https://res.cloudinary.com/ddtclo99a/video/upload/v1763846872/loadervid_1_x4riqn.mp4"
+                    <div className="z-50 max-w-2xl pr-5">
+                        <video ref={ref} src="/vibreon-demo.mp4"
                             playsInline muted loop preload="metadata" className="w-full rounded-xl shadow"
                         />
                     </div>
