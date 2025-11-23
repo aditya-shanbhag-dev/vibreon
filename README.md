@@ -1,7 +1,18 @@
 # Vibreon
 
-Generate personalized short music videos by combining audio (uploaded or extracted from YouTube) with stock background videos, AI-generated lyrics, and audio effects.
-Vibreon is a music video generator that transforms any audio into stunning visual content using FFmpeg. Vibreon makes it effortless to create aesthetic edits, lofi loops, lyric videos, and social-ready content.
+![Vibreon Banner](public/vibreon-banner.png)
+
+### Generate personalized short music videos by combining audio (uploaded or extracted from YouTube) with stock background videos, AI-generated lyrics, and audio effects.
+
+---
+
+![Vibreon OG Image](public/og.png)
+
+#### Vibreon is a music video generator that transforms any audio into stunning visual content using FFmpeg. Vibreon makes it effortless to create aesthetic edits, lofi loops, lyric videos, and social-ready content.
+
+### Try the live app here: [https://vibreon.vercel.app](https://vibreon.vercel.app)
+
+--- 
 
 ## High-level Overview
 
@@ -62,8 +73,7 @@ GROQ_API_KEY=your_groq_api_key
 PORT=8080
 ```
 
-Notes:
-- `GO_SERVER` should point to the running Go backend from the Next.js runtime (e.g., `http://localhost:8080`).
+Notes: `GO_SERVER` should point to the running Go backend from the Next.js runtime (e.g., `http://localhost:8080`).
 
 ## Running locally
 
